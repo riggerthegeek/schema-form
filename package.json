@@ -1,0 +1,25 @@
+{
+  "name": "schema-form",
+  "version": "0.0.0",
+  "description": "Generate rich forms in your application across a wide variety of platforms",
+  "main": "./src/main",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/riggerthegeek/schema-form.git"
+  },
+  "keywords": [
+    "form",
+    "generator",
+    "schema",
+    "tv4"
+  ],
+  "author": "Simon Emms <simon@simonemms.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/riggerthegeek/schema-form/issues"
+  },
+  "homepage": "https://github.com/riggerthegeek/schema-form#readme"
+}
