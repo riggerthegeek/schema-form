@@ -4,6 +4,7 @@
   "description": "Generate rich forms in your application across a wide variety of platforms using a JSON schema",
   "main": "./src/schema-form",
   "scripts": {
+    "ci": "npm test",
     "express": "nodemon --exec babel-node -- example/express/app",
     "lint": "eslint src example",
     "test": "npm run lint"
