@@ -44,24 +44,40 @@ export class SchemaForm {
     /**
      * Generate
      *
-     * This generates the form HTML. It receives
-     * the schema and the form as it's two
-     * arguments and produces the HTML which can
-     * be embedded into the template.
+     * This generates the form HTML. It receives four
+     * arguments, the attributes, the schema, the
+     * definition and the input data. This HTML can
+     * be embedded directly into your HTML.
      *
-     * If no form array is given, it will output
-     * all the form elements exactly how the
-     * schema defines them.
+     * The attrs object is pretty dumb as it puts
+     * anything it receives to the <form> attribute.
+     * There is no checks here, but you should include
+     * an action and method in usual circumstances.
      *
+     * If no definition array is given, it will output
+     * all the form elements exactly how the schema
+     * defines them.
+     *
+     * The input data will be used to prepopulate the
+     * form. This may be default data or input already
+     * by the user.
+     *
+     * @param {object} attrs
      * @param {object} schema
      * @param {Array} definition
+     * @param {object} data
      * @returns {string}
      */
-    generate (schema, definition = ["*"]) {
+    generate (attrs, schema, definition = ["*"], data = {}) {
 
+        /* Ensure the data is always an object */
+        if (_.isObject(data) === false) { data = {}; }
+
+        /* Merge the schema and definition */
         const merged = SchemaForm.merge(schema, definition);
 
-        return merged.reduce((result, form) => {
+        /* Generate the input fields */
+        const input = merged.reduce((result, form) => {
 
             if (!form.type) {
                 return result;
@@ -70,12 +86,22 @@ export class SchemaForm {
             const field = this._templates[form.type] || this._templates["default"];
 
             result += this._engine(field)({
-                form
+                form,
+                data
             });
 
             return result;
 
         }, "");
+
+        /* Wrap the input in a <form> element */
+        const formAttrs = _.reduce(attrs, (result, value, key) => {
+            result += ` ${key}="${value}"`;
+            return result;
+        }, "");
+
+        /* Combine them and return */
+        return `<form${formAttrs}>${input}</form>`;
 
     }
 
