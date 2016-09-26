@@ -14,5 +14,4 @@ This is inspired by [Angular Schema Form](http://schemaform.io).
  - Be usable across any JavaScript template
  - Provide a rich experience for users, even if generated on the server
  - Decoupled from any front-end requirements
- - Use any templating engine
- - Make forms reusable
+ - Make forms reusable 
