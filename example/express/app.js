@@ -12,6 +12,7 @@
 
 
 /* Third-party modules */
+import {compile} from "pug";
 import express from "express";
 
 
@@ -24,8 +25,14 @@ const app = express()
     .set("views", `${__dirname}/views`)
     .set("view engine", "pug");
 
+app.locals.pretty = true;
+
 /* Create the form object - this is common information to all forms */
-const form = new SchemaForm(`${__dirname}/views/forms`);
+const form = new SchemaForm(`${__dirname}/views/forms`, {
+    engine: template => compile(template, {
+        pretty: true
+    })
+});
 
 /* The main route */
 app.get("/", (req, res) => {

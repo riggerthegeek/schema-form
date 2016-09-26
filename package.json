@@ -5,7 +5,7 @@
   "main": "./src/schema-form",
   "scripts": {
     "ci": "npm test",
-    "express": "nodemon --exec babel-node -- example/express/app",
+    "express": "nodemon --exec babel-node --ext js,pug -- example/express/app",
     "lint": "eslint src example",
     "test": "npm run lint"
   },
@@ -28,7 +28,11 @@
     "url": "https://github.com/riggerthegeek/schema-form/issues"
   },
   "homepage": "https://github.com/riggerthegeek/schema-form#readme",
-  "dependencies": {},
+  "dependencies": {
+    "lodash": "^4.16.2",
+    "objectpath": "^1.2.1",
+    "walk": "^2.3.9"
+  },
   "devDependencies": {
     "babel-cli": "^6.14.0",
     "babel-eslint": "^6.1.2",

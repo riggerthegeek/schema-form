@@ -1,3 +1,22 @@
-div.form-group(class="tits")
+div(class=form.htmlClass).form-group
 
-  label.control-label #{ form_title }
+  label.control-label(for=form.key.slice(-1)[0]) #{ form.title }
+
+  if (!form.fieldAddonLeft && !form.fieldAddonRight)
+
+    input.form-control(
+      id=form.key.slice(-1)[0]
+      placeholder=form.placeholder
+      name=form.key.slice(-1)[0]
+    )
+
+  else
+    p 2
+
+  if (!form.feedback !== false)
+
+    span.form-control-feedback(
+      aria-hidden="true"
+    )
+
+  div.help-block !{ form.description }

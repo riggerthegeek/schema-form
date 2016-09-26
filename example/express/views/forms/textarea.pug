@@ -1,0 +1,12 @@
+div.form-group.has-feedback(class=form.htmlClass)
+
+  label.control-label(class=form.labelHtmlClass for=form.key.slice(-1)[0]) #{ form.title }
+
+  textarea.form-control(
+    class=form.fieldHtmlClass
+    id=form.key.slice(-1)[0]
+    name=form.key.slice(-1)[0]
+    placeholder=form.placeholder
+  )
+
+  span.help-block !{ form.description }

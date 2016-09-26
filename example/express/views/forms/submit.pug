@@ -1,0 +1,16 @@
+div.form-group(class=form.htmlClass)
+
+  if (form.type === 'submit')
+
+    input.btn(
+      class=(form.style || "btn-primary") + " " + (form.fieldHtmlClass || "")
+      type="submit"
+      value=form.title
+    )
+
+  else
+
+    button.btn(
+      class=(form.style || "btn-primary") + " " + (form.fieldHtmlClass || "")
+      type="button"
+    ) #{ form.title }
