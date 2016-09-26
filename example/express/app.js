@@ -97,5 +97,6 @@ app.get("/", (req, res) => {
 
 
 app.listen(3000, () => {
+    /* eslint no-console: 0 */
     console.log("Express listening on port 3000");
 });
