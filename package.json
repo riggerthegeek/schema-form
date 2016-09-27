@@ -31,6 +31,7 @@
   "dependencies": {
     "lodash": "^4.16.2",
     "objectpath": "^1.2.1",
+    "tv4": "^1.2.7",
     "walk": "^2.3.9"
   },
   "devDependencies": {

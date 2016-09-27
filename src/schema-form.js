@@ -17,18 +17,22 @@ import path from "path";
 /* Third-party modules */
 import {_} from "lodash";
 import objectpath from "objectpath";
+import tv4 from "tv4";
 import {walkSync} from "walk";
 
 
 /* Files */
 import {defaults} from "./defaults";
 import {Utils} from "./utils";
+import {Validation} from "./validation";
 
 
 export class SchemaForm {
 
 
     constructor (templates, { engine = null } = {}) {
+
+        this._errors = {};
 
         if (_.isPlainObject(templates)) {
             this.setTemplates(templates);
@@ -85,9 +89,22 @@ export class SchemaForm {
 
             const field = this._templates[form.type] || this._templates["default"];
 
+            let error = [];
+
+            try {
+                const key = form.key.slice(-1)[0];
+                const fieldErrors = this._errors[key];
+
+                if (fieldErrors) {
+                    error = error.concat(error, fieldErrors);
+                }
+            } catch (err) {}
+
+            /* Generate the compiled HTML */
             result += this._engine(field)({
                 form,
-                data
+                data,
+                error
             });
 
             return result;
@@ -195,6 +212,56 @@ export class SchemaForm {
         this._templates = templates;
 
         return this;
+
+    }
+
+
+    /**
+     * Validate
+     *
+     * Validates the form data against the schema. This
+     * will change the state of this instance of the
+     * class ready for outputting of the form in the
+     * generate() method
+     *
+     * @param {object} data
+     * @param {object} schema
+     * @returns {boolean}
+     */
+    validate (data, schema) {
+
+        /* Need to remove empty data to trigger required errors */
+        data = _.reduce(data, (result, value, key) => {
+            if (_.isEmpty(value) === false) {
+                result[key] = value;
+            }
+            return result;
+        }, {});
+
+        const validated = tv4.validateMultiple(data, schema);
+
+        if (!validated.valid) {
+
+            /* There's an error - put into object format */
+            this._errors = validated.errors.reduce((result, error) => {
+
+                const key = error.dataPath.slice(1);
+
+                if (_.isArray(result[key]) === false) {
+                    result[key] = [];
+                }
+
+                result[key].push(error);
+
+                return result;
+
+            }, {});
+
+            return false;
+
+        }
+
+        return true;
 
     }
 

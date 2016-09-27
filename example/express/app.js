@@ -57,6 +57,7 @@ const schema = {
         email:  {
             title: "Email",
             type: "string",
+            // minLength: 5,
             pattern: "^\\S+@\\S+$",
             description: "Email will be used for evil."
         },
@@ -98,12 +99,21 @@ const definition = [
 /* The routes */
 app.post("/", (req, res) => {
 
-    res.render("home", {
-        definition,
-        form,
-        schema,
-        data: req.body
-    });
+    const data = req.body;
+
+    if (form.validate(data, schema)) {
+        /* Validated the input */
+        res.redirect("https://google.com");
+    } else {
+
+        res.render("home", {
+            definition,
+            form,
+            schema,
+            data
+        });
+
+    }
 
 });
 
