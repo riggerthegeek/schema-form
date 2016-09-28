@@ -24,7 +24,6 @@ import {walkSync} from "walk";
 /* Files */
 import {defaults} from "./defaults";
 import {Utils} from "./utils";
-import {Validation} from "./validation";
 
 
 export class SchemaForm {
@@ -72,10 +71,7 @@ export class SchemaForm {
      * @param {object} data
      * @returns {string}
      */
-    generate (attrs, schema, definition = ["*"], data = {}) {
-
-        /* Ensure the data is always an object */
-        if (_.isObject(data) === false) { data = {}; }
+    generate (attrs, schema, definition = ["*"], data = null) {
 
         /* Merge the schema and definition */
         const merged = SchemaForm.merge(schema, definition);
@@ -87,23 +83,33 @@ export class SchemaForm {
                 return result;
             }
 
+            /* If no data set, treat as pristine */
+            if (data !== null) {
+                form.$pristine = false;
+            }
+
             const field = this._templates[form.type] || this._templates["default"];
 
-            let error = [];
+            let error = null;
 
             try {
-                const key = form.key.slice(-1)[0];
-                const fieldErrors = this._errors[key];
 
-                if (fieldErrors) {
-                    error = error.concat(error, fieldErrors);
+                const key = form.key.slice(-1)[0];
+                const fieldError = this._errors[key][0];
+
+                if (fieldError) {
+                    error = fieldError;
                 }
+
+                form.$valid = false;
+                form.description = error.message;
+
             } catch (err) {}
 
-            /* Generate the compiled HTML */
+            /* Generate the compiled HTML - always send a data object */
             result += this._engine(field)({
                 form,
-                data,
+                data: _.isObject(data) ? data : {},
                 error
             });
 
@@ -245,7 +251,7 @@ export class SchemaForm {
             /* There's an error - put into object format */
             this._errors = validated.errors.reduce((result, error) => {
 
-                const key = error.dataPath.slice(1);
+                const { key } = error.params;
 
                 if (_.isArray(result[key]) === false) {
                     result[key] = [];

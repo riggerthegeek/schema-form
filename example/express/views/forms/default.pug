@@ -1,4 +1,9 @@
-div(class=form.htmlClass).form-group
+div(
+  class=form.htmlClass
+  class=!form.$pristine && form.$valid ? 'has-success' : ''
+  class=!form.$pristine && !form.$valid ? 'has-error' : ''
+  class=!form.feedback !== false ? 'has-feedback' : ''
+).form-group
 
   label.control-label(for=form.key.slice(-1)[0]) #{ form.title }
 
@@ -16,8 +21,10 @@ div(class=form.htmlClass).form-group
 
   if (!form.feedback !== false)
 
-    span.form-control-feedback(
+    span.form-control-feedback.glyphicon(
       aria-hidden="true"
+      class=!form.$pristine && !form.$valid ? 'glyphicon-ok' : ''
+      class=!form.$pristine && !form.$valid ? 'glyphicon-remove' : ''
     )
 
   div.help-block !{ form.description }

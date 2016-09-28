@@ -49,6 +49,10 @@ export class Utils {
         if (schema.minimum) { formObject.minimum = schema.minimum + (schema.exclusiveMinimum ? 1 : 0); }
         if (schema.maximum) { formObject.maximum = schema.maximum - (schema.exclusiveMaximum ? 1 : 0); }
 
+        /* Validity states */
+        formObject.$pristine = true;
+        formObject.$valid = false;
+
         return formObject;
 
     }

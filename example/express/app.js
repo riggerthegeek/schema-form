@@ -84,11 +84,14 @@ const schema = {
  */
 const definition = [
     "name",
-    "email",
+    {
+        "key": "email",
+        htmlClass: "some-class"
+    },
     {
         "key": "comment",
         "type": "textarea",
-        "placeholder": "Make a comment"
+        "placeholder": "Make a comment",
     },
     {
         "type": "submit",
