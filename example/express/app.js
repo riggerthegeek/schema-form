@@ -29,6 +29,7 @@ const app = express()
         extended: false
     }));
 
+/* Pretty output to make more legible */
 app.locals.pretty = true;
 
 /* Create the form object - this is common information to all forms */
