@@ -1,7 +1,16 @@
 /**
  * schema-form
  *
- * Generate rich forms in your application across a wide variety of platforms
+ * Generate rich forms in your application across
+ * a wide variety of platforms.
+ *
+ * This is the factory that exists to build your
+ * form instances. This will typically invoked only
+ * once per application, likely when you are in the
+ * config phase of your application. This tells
+ * the generator what templates to use and how to
+ * compile them. It also has a factory to create
+ * the individual forms.
  *
  * @license MIT
  */
@@ -16,22 +25,17 @@ import path from "path";
 
 /* Third-party modules */
 import {_} from "lodash";
-import objectpath from "objectpath";
-import tv4 from "tv4";
 import {walkSync} from "walk";
 
 
 /* Files */
-import {defaults} from "./defaults";
-import {Utils} from "./utils";
+import {Form} from "./form";
 
 
-export class SchemaForm {
+class SchemaForm {
 
 
     constructor (templates, { engine = null } = {}) {
-
-        this._errors = {};
 
         if (_.isPlainObject(templates)) {
             this.setTemplates(templates);
@@ -45,86 +49,22 @@ export class SchemaForm {
 
 
     /**
-     * Generate
+     * Form
      *
-     * This generates the form HTML. It receives four
-     * arguments, the attributes, the schema, the
-     * definition and the input data. This HTML can
-     * be embedded directly into your HTML.
+     * A factory method to create a Builder
+     * instance. This is how we build an
+     * individual form.
      *
-     * The attrs object is pretty dumb as it puts
-     * anything it receives to the <form> attribute.
-     * There is no checks here, but you should include
-     * an action and method in usual circumstances.
-     *
-     * If no definition array is given, it will output
-     * all the form elements exactly how the schema
-     * defines them.
-     *
-     * The input data will be used to prepopulate the
-     * form. This may be default data or input already
-     * by the user.
-     *
-     * @param {object} attrs
      * @param {object} schema
      * @param {Array} definition
-     * @param {object} data
-     * @returns {string}
+     * @returns {Form}
      */
-    generate (attrs, schema, definition = ["*"], data = null) {
+    form (schema, definition = null) {
 
-        /* Merge the schema and definition */
-        const merged = SchemaForm.merge(schema, definition);
-
-        /* Generate the input fields */
-        const input = merged.reduce((result, form) => {
-
-            if (!form.type) {
-                return result;
-            }
-
-            /* If no data set, treat as pristine */
-            if (data !== null) {
-                form.$pristine = false;
-            }
-
-            const field = this._templates[form.type] || this._templates["default"];
-
-            let error = null;
-
-            try {
-
-                const key = form.key.slice(-1)[0];
-                const fieldError = this._errors[key][0];
-
-                if (fieldError) {
-                    error = fieldError;
-                }
-
-                form.$valid = false;
-                form.description = error.message;
-
-            } catch (err) {}
-
-            /* Generate the compiled HTML - always send a data object */
-            result += this._engine(field)({
-                form,
-                data: _.isObject(data) ? data : {},
-                error
-            });
-
-            return result;
-
-        }, "");
-
-        /* Wrap the input in a <form> element */
-        const formAttrs = _.reduce(attrs, (result, value, key) => {
-            result += ` ${key}="${value}"`;
-            return result;
-        }, "");
-
-        /* Combine them and return */
-        return `<form${formAttrs}>${input}</form>`;
+        return new Form(schema, definition, {
+            engine: this._engine,
+            templates: this._templates
+        });
 
     }
 
@@ -198,6 +138,7 @@ export class SchemaForm {
         /* Get all the files */
         walkSync(templatePath, opts);
 
+        /* Now we have them, set the templates */
         return this.setTemplates(templates);
 
     }
@@ -222,221 +163,8 @@ export class SchemaForm {
     }
 
 
-    /**
-     * Validate
-     *
-     * Validates the form data against the schema. This
-     * will change the state of this instance of the
-     * class ready for outputting of the form in the
-     * generate() method
-     *
-     * @param {object} data
-     * @param {object} schema
-     * @returns {boolean}
-     */
-    validate (data, schema) {
-
-        /* Need to remove empty data to trigger required errors */
-        data = _.reduce(data, (result, value, key) => {
-            if (_.isEmpty(value) === false) {
-                result[key] = value;
-            }
-            return result;
-        }, {});
-
-        const validated = tv4.validateMultiple(data, schema);
-
-        if (!validated.valid) {
-
-            /* There's an error - put into object format */
-            this._errors = validated.errors.reduce((result, error) => {
-
-                const { key } = error.params;
-
-                if (_.isArray(result[key]) === false) {
-                    result[key] = [];
-                }
-
-                result[key].push(error);
-
-                return result;
-
-            }, {});
-
-            return false;
-
-        }
-
-        return true;
-
-    }
-
-
-    /**
-     * Default Form
-     *
-     * Builds up the default form element
-     *
-     * @param {object} schema
-     * @param {object} ignore
-     * @param {object} global
-     * @returns {{form: Array, lookup: {}}}
-     */
-    static defaultForm (schema, ignore = {}, global = {}) {
-
-        const form = [];
-        let lookup = {};
-
-        if (Utils.stripNullType(schema.type) === "object") {
-
-            _.each(schema.properties, (value, key) => {
-
-                if (ignore[key] !== true) {
-
-                    const required = schema.required && schema.required.indexOf(key) !== -1;
-                    const definition = SchemaForm.defaultFormDefinition(key, value, {
-                        path: [ key ],
-                        lookup,
-                        ignore,
-                        required,
-                        global
-                    });
-
-                    if (definition) {
-                        form.push(definition);
-                    }
-
-                }
-
-            });
-
-        } else {
-            throw new SyntaxError(`SchemaForm error: Only type "object" is allowed at root level: ${schema.type}`);
-        }
-
-        return {
-            form,
-            lookup
-        };
-
-    }
-
-
-    /**
-     * Default Form Definition
-     *
-     * Get the default form definition. This can
-     * be overridden, but it's what is implicit
-     * from the schema.
-     *
-     * @param {string} name
-     * @param {object} schema
-     * @param {object} options
-     * @returns {object}
-     */
-    static defaultFormDefinition (name, schema, options) {
-
-        /* Get the relevant rules */
-        const rules = defaults[Utils.stripNullType(schema.type)];
-
-        if (rules) {
-
-            let def;
-            for (let i = 0; i < rules.length; i++) {
-
-                def = rules[i](name, schema, options);
-
-                /* Search for rules */
-                if (def) {
-
-                    return def;
-
-                }
-
-            }
-
-        }
-
-    }
-
-
-    /**
-     * Merge
-     *
-     * Merges the schema and the form definition
-     * into a single array of objects
-     *
-     * @param {object} schema
-     * @param {object} form
-     * @param {object} ignore
-     * @param {object} options
-     * @param {boolean} readonly
-     * @returns {object[]}
-     */
-    static merge (schema, form, ignore = {}, options = {}, readonly = false) {
-
-        const defaultForm = SchemaForm.defaultForm(schema, ignore, options);
-
-        const allId = form.indexOf("*");
-        if (allId >= 0) {
-            /* We're using "*" to generate the forms */
-            form = form.slice(0, allId)
-                .concat(defaultForm.form)
-                .concat(form.slice(allId + 1));
-        }
-
-        /* Get readonly from the root object */
-        readonly = readonly || schema.readonly || schema.readOnly;
-
-        const lookup = defaultForm.lookup;
-
-        return form.map(obj => {
-
-            if (_.isString(obj)) {
-                obj = {
-                    key: obj
-                };
-            }
-
-            if (obj.key) {
-                if (_.isString(obj.key)) {
-                    obj.key = objectpath.parse(obj.key);
-                }
-            }
-
-            // @todo obj.itemForm
-
-            if (obj.key) {
-
-                const strId = objectpath.stringify(obj.key);
-
-                if (lookup[strId]) {
-
-                    const schemaDefaults = lookup[strId];
-
-                    _.each(schemaDefaults, (value, attr) => {
-                        if (obj[attr] === void 0) {
-                            obj[attr] = schemaDefaults[attr];
-                        }
-                    });
-
-                }
-
-            }
-
-            // @todo readonly
-
-            // @todo items
-
-            // @todo tabs
-
-            // @todo checkbox
-
-            return obj;
-
-        });
-
-    }
-
-
 }
+
+
+/* Expose on module.exports for maximum compatibility */
+module.exports = SchemaForm;

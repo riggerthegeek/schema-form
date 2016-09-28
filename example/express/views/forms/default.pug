@@ -1,19 +1,15 @@
 div(
   class=form.htmlClass
-  class=!form.$pristine && form.$valid ? 'has-success' : ''
-  class=!form.$pristine && !form.$valid ? 'has-error' : ''
-  class=!form.feedback !== false ? 'has-feedback' : ''
 ).form-group
 
-  label.control-label(for=form.key.slice(-1)[0]) #{ form.title }
+  label.control-label(for=form.key) #{ form.title }
 
   if (!form.fieldAddonLeft && !form.fieldAddonRight)
 
     input.form-control(
-      id=form.key.slice(-1)[0]
+      id=form.key
       placeholder=form.placeholder
-      name=form.key.slice(-1)[0]
-      value=data[form.key.slice(-1)[0]]
+      name=form.key
     )
 
   else

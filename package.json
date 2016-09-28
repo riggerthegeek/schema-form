@@ -5,7 +5,7 @@
   "main": "./src/schema-form",
   "scripts": {
     "ci": "npm test",
-    "express": "nodemon --exec babel-node --ext js,pug -- example/express/app",
+    "express": "nodemon --exec babel-node --ext js,json,pug -- example/express/app",
     "lint": "eslint src example",
     "test": "npm run lint"
   },
@@ -30,7 +30,6 @@
   "homepage": "https://github.com/riggerthegeek/schema-form#readme",
   "dependencies": {
     "lodash": "^4.16.2",
-    "objectpath": "^1.2.1",
     "tv4": "^1.2.7",
     "walk": "^2.3.9"
   },
