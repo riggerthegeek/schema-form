@@ -24,6 +24,7 @@ export class Element {
     constructor (data = {}) {
 
         this.description = data.description;
+        this.htmlClass = null;
         this.key = data.key;
         this.maximum = data.maximum;
         this.maxLength = data.maxLength;

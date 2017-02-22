@@ -18,6 +18,7 @@
 
 /* Third-party modules */
 import {_} from "lodash";
+import tv4 from "tv4";
 
 
 /* Files */
@@ -31,10 +32,41 @@ export class Form {
         this._definition = definition;
         this._engine = engine;
         this._schema = schema;
+
         this._templates = templates;
 
         /* Merge the schema and the definition */
         this._merged = Form.merge(this._schema, this._definition);
+    }
+
+
+    get errors () {
+        return this._errors || [];
+    }
+
+
+    set errors (errors) {
+        this._errors = errors;
+    }
+
+
+    get isSubmitted () {
+        return this._isSubmitted || false;
+    }
+
+
+    set isSubmitted (submitted) {
+        this._isSubmitted = true;
+    }
+
+
+    get values () {
+        return this._values || {};
+    }
+
+
+    set values (values) {
+        this._values = values;
     }
 
 
@@ -54,10 +86,13 @@ export class Form {
      * No checks or formatting take place in here
      * so it's up to you to get it right.
      *
+     * The default attrs are method="POST" and
+     * action=""
+     *
      * @param {object} attrs
      * @returns {string}
      */
-    generate (attrs = {}) {
+    generate (attrs = { method: "POST", action: "" }) {
 
         /* Generate the input fields */
         const input = this._merged.reduce((result, form) => {
@@ -71,7 +106,8 @@ export class Form {
             const template = this._templates[form.type] || this._templates["default"];
 
             result += this._engine(template)({
-                form
+                form,
+                formObj: this
             });
 
             return result;
@@ -87,6 +123,57 @@ export class Form {
         /* Combine them and return */
         return `<form${formAttrs}>${input}</form>`;
 
+    }
+
+    getError (name) {
+        if (this.isSubmitted) {
+            return this.errors.find(({ key }) => key === name);
+        }
+    }
+
+    hasError (name) {
+        return !!this.getError(name);
+    }
+
+    hasSuccess (name) {
+        return !this.getError(name);
+    }
+
+    /**
+     * Validate
+     *
+     * Validates the input body. This sets the
+     * form state to 'submitted'.
+     *
+     * @param {object} data
+     * @returns {boolean}
+     */
+    validate (data) {
+        this.isSubmitted = true;
+
+        /* Clean up the data */
+        this.values = _.reduce(data, (result, value, key) => {
+            if (_.isEmpty(value) === false) {
+                result[key] = value;
+            }
+            return result;
+        }, {});
+
+        const {errors, valid} = tv4.validateMultiple(this.values, this._schema);
+
+        if (!valid) {
+            this.errors = errors.map(err => {
+                const key = err.params.key ? err.params.key : err.dataPath.replace(/^\//, "");
+
+                return {
+                    code: err.code,
+                    key,
+                    message: err.message
+                };
+            });
+        }
+
+        return this.errors.length === 0;
     }
 
 
