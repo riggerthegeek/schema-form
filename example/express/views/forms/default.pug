@@ -1,5 +1,10 @@
 div(
-  class=form.htmlClass
+  class=[
+    form.htmlClass,
+    form.feedback ? '' : 'has-feedback',
+    formObj.hasError(form.key) ? 'has-error' : '',
+    formObj.hasSuccess(form.key) ? 'has-success' : ''
+  ]
 ).form-group
 
   label.control-label(for=form.key) #{ form.title }
@@ -10,17 +15,23 @@ div(
       id=form.key
       placeholder=form.placeholder
       name=form.key
+      value=formObj.values[form.key]
     )
 
   else
     p 2
 
-  if (!form.feedback !== false)
+  if (formObj.isSubmitted && !form.feedback)
 
     span.form-control-feedback.glyphicon(
       aria-hidden="true"
-      class=!form.$pristine && !form.$valid ? 'glyphicon-ok' : ''
-      class=!form.$pristine && !form.$valid ? 'glyphicon-remove' : ''
+      class=[
+        formObj.hasError(form.key) ? 'glyphicon-remove' : 'glyphicon-ok'
+      ]
     )
 
-  div.help-block !{ form.description }
+  div.help-block
+    if (formObj.hasError(form.key))
+      | !{ formObj.getError(form.key).message }
+    else
+      | !{ form.description }

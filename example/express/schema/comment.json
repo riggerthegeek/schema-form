@@ -10,8 +10,7 @@
       "title": "Email",
       "type": "string",
       "pattern": "^\\S+@\\S+$",
-      "description": "Email will be used for evil.",
-      "required": true
+      "description": "Email will be used for evil."
     },
     "comment": {
       "title": "Comment",
@@ -22,6 +21,7 @@
   },
   "required": [
     "name",
+    "email",
     "comment"
   ]
 }

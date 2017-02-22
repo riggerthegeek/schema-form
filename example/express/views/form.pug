@@ -9,17 +9,17 @@ html(lang="en")
 
     link(href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet")
 
-    title Express Pug Examples
+    title Express Pug Example: #{ schemaName }
 
   body
 
     div.container
 
-      h1 List of form examples
+      ol.breadcrumb
+        li
+          a(href='/') Home
+        li.active #{ schemaName }
 
-      ul
-        each schema in schemas
-          li
-            a(
-              href='/' + schema
-            ) #{ schema }
+      h1 #{ schemaName }
+
+      div !{ form.generate() }

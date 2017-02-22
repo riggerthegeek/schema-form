@@ -1,4 +1,10 @@
-div.form-group.has-feedback(class=form.htmlClass)
+div.form-group.has-feedback(
+  class=[
+    form.htmlClass,
+    formObj.hasError(form.key) ? 'has-error' : '',
+    formObj.hasSuccess(form.key) ? 'has-success' : ''
+  ]
+)
 
   label.control-label(class=form.labelHtmlClass for=form.key) #{ form.title }
 
@@ -7,6 +13,10 @@ div.form-group.has-feedback(class=form.htmlClass)
     id=form.key
     name=form.key
     placeholder=form.placeholder
-  )
+  ) !{ formObj.values[form.key] }
 
-  span.help-block !{ form.description }
+  div.help-block
+    if (formObj.hasError(form.key))
+      | !{ formObj.getError(form.key).message }
+    else
+      | !{ form.description }

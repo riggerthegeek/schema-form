@@ -9,6 +9,7 @@
 
 
 /* Node modules */
+import fs from 'fs';
 
 
 /* Third-party modules */
@@ -45,15 +46,15 @@ const schemaForm = new SchemaForm(`${__dirname}/views/forms`, {
     })
 });
 
-/*
-    The schema tells the form how the data
-    should look when submitted. It also contains
-    information about it's validation etc.
-
-    This conforms to draft V4 of the JSON schema
-    definition http://json-schema.org/latest/json-schema-core.html
- */
-const schema = require("./schema/comment.json");
+// /*
+//     The schema tells the form how the data
+//     should look when submitted. It also contains
+//     information about it's validation etc.
+//
+//     This conforms to draft V4 of the JSON schema
+//     definition http://json-schema.org/latest/json-schema-core.html
+//  */
+// const schema = require("./schema/comment.json");
 
 /*
     This is information on how the form will be
@@ -86,9 +87,13 @@ app.post("/", (req, res) => {
 
     const data = req.body;
 
-    if (form.validate(data, schema)) {
+    if (form.validate(data)) {
         /* Validated the input */
-        res.redirect("https://google.com");
+        // res.redirect("https://google.com");
+        res.json({
+            success: true,
+            data
+        });
     } else {
 
         res.render("home", {
@@ -100,13 +105,35 @@ app.post("/", (req, res) => {
 });
 
 app.get("/", (req, res) => {
+    fs.readdir(`${__dirname}/schema`, (err, files) => {
+        const schemas = files.map(file => {
+            return file.replace('.json', '');
+        });
 
-    /* Create the form */
-    const form = schemaForm.form(schema, definition);
-
-    res.render("home", {
-        form
+        res.render("home", {
+            schemas
+        });
     });
+});
+
+app.get("/:schema", (req, res) => {
+
+    const schemaName = req.params.schema;
+
+    try {
+        const schema = require(`./schema/${schemaName}.json`);
+
+        /* Create the form */
+        const form = schemaForm.form(schema, definition);
+
+        res.render("form", {
+            form,
+            schemaName
+        });
+    } catch (err) {
+        res.status(404)
+            .send(`Unknown schema '${schemaName}'`);
+    }
 
 });
 
