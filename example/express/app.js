@@ -9,7 +9,7 @@
 
 
 /* Node modules */
-import fs from 'fs';
+import fs from "fs";
 
 
 /* Third-party modules */
@@ -73,7 +73,7 @@ const definition = [
 app.get("/", (req, res) => {
     fs.readdir(`${__dirname}/schema`, (err, files) => {
         const schemas = files.map(file => {
-            return file.replace('.json', '');
+            return file.replace(".json", "");
         });
 
         res.render("home", {
