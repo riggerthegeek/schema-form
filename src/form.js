@@ -56,7 +56,7 @@ export class Form {
 
 
     set isSubmitted (submitted) {
-        this._isSubmitted = true;
+        this._isSubmitted = submitted;
     }
 
 

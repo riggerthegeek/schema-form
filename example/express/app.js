@@ -46,29 +46,6 @@ const schemaForm = new SchemaForm(`${__dirname}/views/forms`, {
     })
 });
 
-/*
-    This is information on how the form will be
-    generated. We can use things as-is in the
-    schema (eg, name and email), override certain
-    parts of it (eg, comment) or create new items
-    entirely (the submit button).
- */
-const definition = [
-    "name",
-    {
-        key: "email"
-    },
-    {
-        key: "comment",
-        type: "textarea",
-        placeholder: "Make a comment"
-    },
-    {
-        type: "submit",
-        title: "OK"
-    }
-];
-
 /* The routes */
 app.get("/", (req, res) => {
     fs.readdir(`${__dirname}/schema`, (err, files) => {
@@ -96,6 +73,15 @@ app.post("/:schema", (req, res) => {
          definition http://json-schema.org/latest/json-schema-core.html
          */
         const schema = require(`./schema/${schemaName}.json`);
+
+        /*
+         This is information on how the form will be
+         generated. We can use things as-is in the
+         schema (eg, name and email), override certain
+         parts of it (eg, comment) or create new items
+         entirely (the submit button).
+         */
+        const definition = require(`./definition/${schemaName}`);
 
         /* Create the form */
         const form = schemaForm.form(schema, definition);
@@ -136,6 +122,15 @@ app.get("/:schema", (req, res) => {
          definition http://json-schema.org/latest/json-schema-core.html
          */
         const schema = require(`./schema/${schemaName}.json`);
+
+        /*
+         This is information on how the form will be
+         generated. We can use things as-is in the
+         schema (eg, name and email), override certain
+         parts of it (eg, comment) or create new items
+         entirely (the submit button).
+         */
+        const definition = require(`./definition/${schemaName}`);
 
         /* Create the form */
         const form = schemaForm.form(schema, definition);
