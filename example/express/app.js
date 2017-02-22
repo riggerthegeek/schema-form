@@ -46,16 +46,6 @@ const schemaForm = new SchemaForm(`${__dirname}/views/forms`, {
     })
 });
 
-// /*
-//     The schema tells the form how the data
-//     should look when submitted. It also contains
-//     information about it's validation etc.
-//
-//     This conforms to draft V4 of the JSON schema
-//     definition http://json-schema.org/latest/json-schema-core.html
-//  */
-// const schema = require("./schema/comment.json");
-
 /*
     This is information on how the form will be
     generated. We can use things as-is in the
@@ -97,6 +87,14 @@ app.post("/:schema", (req, res) => {
     const schemaName = req.params.schema;
 
     try {
+        /*
+         The schema tells the form how the data
+         should look when submitted. It also contains
+         information about it's validation etc.
+
+         This conforms to draft V4 of the JSON schema
+         definition http://json-schema.org/latest/json-schema-core.html
+         */
         const schema = require(`./schema/${schemaName}.json`);
 
         /* Create the form */
@@ -129,6 +127,14 @@ app.get("/:schema", (req, res) => {
     const schemaName = req.params.schema;
 
     try {
+        /*
+         The schema tells the form how the data
+         should look when submitted. It also contains
+         information about it's validation etc.
+
+         This conforms to draft V4 of the JSON schema
+         definition http://json-schema.org/latest/json-schema-core.html
+         */
         const schema = require(`./schema/${schemaName}.json`);
 
         /* Create the form */
