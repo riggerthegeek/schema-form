@@ -106,9 +106,9 @@ app.post("/:schema", (req, res) => {
 
         if (form.validate(data)) {
             /* Validated the input */
-            // res.redirect("https://google.com");
             res.json({
                 success: true,
+                schemaName,
                 data
             });
         } else {
