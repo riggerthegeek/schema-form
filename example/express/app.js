@@ -80,30 +80,6 @@ const definition = [
 ];
 
 /* The routes */
-app.post("/", (req, res) => {
-
-    /* Create the form */
-    const form = schemaForm.form(schema, definition);
-
-    const data = req.body;
-
-    if (form.validate(data)) {
-        /* Validated the input */
-        // res.redirect("https://google.com");
-        res.json({
-            success: true,
-            data
-        });
-    } else {
-
-        res.render("home", {
-            form
-        });
-
-    }
-
-});
-
 app.get("/", (req, res) => {
     fs.readdir(`${__dirname}/schema`, (err, files) => {
         const schemas = files.map(file => {
@@ -114,6 +90,38 @@ app.get("/", (req, res) => {
             schemas
         });
     });
+});
+
+app.post("/:schema", (req, res) => {
+
+    const schemaName = req.params.schema;
+
+    try {
+        const schema = require(`./schema/${schemaName}.json`);
+
+        /* Create the form */
+        const form = schemaForm.form(schema, definition);
+
+        const data = req.body;
+
+        if (form.validate(data)) {
+            /* Validated the input */
+            // res.redirect("https://google.com");
+            res.json({
+                success: true,
+                data
+            });
+        } else {
+            res.render("form", {
+                form,
+                schemaName
+            });
+        }
+    } catch (err) {
+        res.status(404)
+            .send(`Unknown schema '${schemaName}'`);
+    }
+
 });
 
 app.get("/:schema", (req, res) => {
