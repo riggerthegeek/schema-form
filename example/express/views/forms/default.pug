@@ -9,17 +9,22 @@ div(
 
   label.control-label(for=form.key) #{ form.title }
 
-  if (!form.fieldAddonLeft && !form.fieldAddonRight)
+  div(
+    class=form.fieldAddonLeft || form.fieldAddonRight ? 'input-group' : ''
+  )
+    if (form.fieldAddonLeft)
+      span.input-group-addon!= form.fieldAddonLeft
 
     input.form-control(
       id=form.key
       placeholder=form.placeholder
       name=form.key
+      type=form.type
       value=formObj.values[form.key]
     )
 
-  else
-    p 2
+    if (form.fieldAddonRight)
+      span.input-group-addon!= form.fieldAddonRight
 
   if (formObj.isSubmitted && !form.feedback)
 
