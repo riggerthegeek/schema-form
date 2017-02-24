@@ -3,25 +3,26 @@
   "title": "Comment",
   "properties": {
     "name":  {
-      "title": "Name",
+      "title": "Name *",
       "type": "string"
     },
     "email":  {
-      "title": "Email",
+      "title": "Email *",
       "type": "string",
       "pattern": "^\\S+@\\S+$",
-      "description": "Email will be used for evil."
+      "description": "Email will be used for evil.",
+      "required": true
     },
     "comment": {
-      "title": "Comment",
+      "title": "Comment *",
       "type": "string",
       "maxLength": 20,
-      "validationMessage": "Don't be greedy!"
+      "validationMessage": "Don't be greedy!",
+      "required": true
     }
   },
   "required": [
     "name",
-    "email",
     "comment"
   ]
 }

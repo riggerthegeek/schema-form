@@ -31,12 +31,14 @@ export class Form {
     constructor (schema, definition, { engine, templates }) {
         this._definition = definition;
         this._engine = engine;
-        this._schema = schema;
-
-        this._templates = templates;
 
         /* Merge the schema and the definition */
-        this._merged = Form.merge(this._schema, this._definition);
+        this._merged = Form.merge(schema, this._definition);
+
+        /* Set the schema to the class */
+        this.schema = schema;
+
+        this._templates = templates;
     }
 
 
@@ -57,6 +59,24 @@ export class Form {
 
     set isSubmitted (submitted) {
         this._isSubmitted = submitted;
+    }
+
+
+    get schema () {
+        return this._schema;
+    }
+
+
+    set schema (schema) {
+        /* Extract the required inside the properties */
+        schema.required = _.reduce(schema.properties, (result, { required }, key) => {
+            if (required && result.indexOf(key) === -1) {
+                result.push(key);
+            }
+            return result;
+        }, schema.required);
+
+        this._schema = schema;
     }
 
 
@@ -159,7 +179,7 @@ export class Form {
             return result;
         }, {});
 
-        const {errors, valid} = tv4.validateMultiple(this.values, this._schema);
+        const {errors, valid} = tv4.validateMultiple(this.values, this.schema);
 
         if (!valid) {
             this.errors = errors.map(err => {
@@ -195,7 +215,7 @@ export class Form {
             const form = _.reduce(schema.properties, (result, value, key) => {
 
                 /* The required key could be set by on the schema */
-                const required = schema.required && schema.required.indexOf(key) !== -1;
+                const required = value.required || (schema.required && schema.required.indexOf(key) !== -1);
                 const element = Element.byElementRule(key, value, {
                     required
                 });
