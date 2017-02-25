@@ -7,7 +7,7 @@ div(
   ]
 ).form-group
 
-  label.control-label(for=form.key) #{ form.title }
+  label.control-label(for=form.key)!= form.title
 
   div(
     class=form.fieldAddonLeft || form.fieldAddonRight ? 'input-group' : ''

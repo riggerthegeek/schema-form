@@ -43,41 +43,70 @@ export class Element {
             string: [
                 Element.select,
                 Element.text
-            ]
+            ],
+            // object: [
+            //     Element.fieldset
+            // ],
+            number: [
+                Element.number
+            ],
+            integer: [
+                Element.integer
+            ],
+            boolean: [
+                Element.checkbox
+            ],
+            // array: [
+            //     Element.checkboxes,
+            //     Element.array
+            // ]
         };
 
         return rules[rule];
 
     }
 
-
-    static text (name, schema, options) {
-
-        if (schema.type === "string" && !schema.enum) {
-
+    static checkbox (name, schema, options) {
+        if (schema.type === "boolean") {
             const obj = Element.toElement(name, schema, options);
-
-            obj.type = "text";
-
+            obj.type = "checkbox";
             return obj;
-
         }
+    }
 
+    static integer (name, schema, options) {
+        if (schema.type === "integer") {
+            const obj = Element.toElement(name, schema, options);
+            obj.type = "number";
+            return obj;
+        }
+    };
+
+
+    static number (name, schema, options) {
+        if (schema.type === "number") {
+            const obj = Element.toElement(name, schema, options);
+            obj.type = "number";
+            return obj;
+        }
     }
 
 
     static select (name, schema, options) {
-
         if (schema.type === "string" && schema.enum) {
-
             const obj = Element.toElement(name, schema, options);
-
             obj.type = "select";
-
             return obj;
-
         }
+    }
 
+
+    static text (name, schema, options) {
+        if (schema.type === "string" && !schema.enum) {
+            const obj = Element.toElement(name, schema, options);
+            obj.type = "text";
+            return obj;
+        }
     }
 
 

@@ -22,6 +22,7 @@ import tv4 from "tv4";
 
 
 /* Files */
+import {Cast} from "./cast";
 import {Element} from "./element";
 
 
@@ -159,6 +160,10 @@ export class Form {
         return !this.getError(name);
     }
 
+    isDisabled (name) {
+        return false;
+    }
+
     /**
      * Validate
      *
@@ -171,11 +176,19 @@ export class Form {
     validate (data) {
         this.isSubmitted = true;
 
-        /* Clean up the data */
-        this.values = _.reduce(data, (result, value, key) => {
+        /* Clean up the data and cast to type */
+        this.values = _.reduce(this._merged, (result, { key, type }) => {
+            let value = data[key];
             if (_.isEmpty(value) === false) {
+                /* Do we need to cast the data? */
+                if (_.isFunction(Cast, type)) {
+                    value = Cast[type](value);
+                }
+
+                /* Set to the object */
                 result[key] = value;
             }
+
             return result;
         }, {});
 

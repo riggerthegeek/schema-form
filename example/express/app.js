@@ -88,6 +88,8 @@ app.post("/:schema", (req, res) => {
 
         const data = req.body;
 
+        console.log(data);
+
         if (form.validate(data)) {
             /* Validated the input */
             res.json({

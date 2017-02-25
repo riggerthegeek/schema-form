@@ -1,0 +1,21 @@
+div(
+  class=[
+    form.htmlClass,
+    form.feedback ? '' : 'has-feedback',
+    !formObj.isDisabled(form.key) && formObj.hasError(form.key) ? 'has-error' : '',
+    !formObj.isDisabled(form.key) && formObj.hasSuccess(form.key) ? 'has-success' : ''
+  ]
+).form-group
+
+  - var attrs = {}
+  - if (formObj.values[form.key] === 'true') { attrs.checked = 'checked'; }
+
+  input(
+    id=form.key
+    placeholder=form.placeholder
+    name=form.key
+    type='checkbox'
+    value='true'
+  )&attributes(attrs)
+
+  label.control-label(for=form.key)!= form.title
